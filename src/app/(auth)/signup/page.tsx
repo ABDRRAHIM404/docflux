@@ -2,11 +2,9 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
 import { User, Building2, Mail, Lock, Loader2 } from 'lucide-react';
 
 export default function SignupPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,7 +26,10 @@ export default function SignupPage() {
         password: formData.password,
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        console.error('Signup error:', authError.message);
+        throw authError;
+      }
 
       if (authData.user) {
         const { error: profileError } = await supabase
@@ -42,10 +43,13 @@ export default function SignupPage() {
             },
           ]);
 
-        if (profileError) throw profileError;
+        if (profileError) {
+          console.error('Profile creation error:', profileError.message);
+          throw profileError;
+        }
       }
 
-      router.push('/calendar');
+      window.location.href = '/calendar';
     } catch (err) {
       const error = err as Error;
       setError(error.message || 'Une erreur est survenue lors de l\'inscription.');

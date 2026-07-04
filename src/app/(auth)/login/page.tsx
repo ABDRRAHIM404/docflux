@@ -2,11 +2,9 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
 import { Mail, Lock, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,9 +24,13 @@ export default function LoginPage() {
         password: formData.password,
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        console.error('Auth error:', authError.message);
+        throw authError;
+      }
 
-      router.push('/calendar');
+      // Force a full page reload to ensure the middleware sees the new session cookie
+      window.location.href = '/calendar';
     } catch (err) {
       const error = err as Error;
       setError(error.message || 'Identifiants invalides.');
